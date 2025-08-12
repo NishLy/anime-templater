@@ -57,23 +57,25 @@ const Editor = () => {
     }
   }
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <GridContainer className="w-screen">
-        {Object.entries(containers).map(([id, items]) => (
-          <Droppable<string> key={id} id={id} items={items.children}>
-            {(item) => (
-              <div className="w-full h-20 bg-white">
-                {item.map((e) => (
-                  <Draggable key={e} id={e}>
-                    <button className="bg-green-300">Drop me</button>
-                  </Draggable>
-                ))}
-              </div>
-            )}
-          </Droppable>
-        ))}
-      </GridContainer>
-    </DndContext>
+    <div className="bg-white min-h-screen">
+      <DndContext onDragEnd={handleDragEnd}>
+        <GridContainer className="w-full">
+          {Object.entries(containers).map(([id, items]) => (
+            <Droppable<string> key={id} id={id} items={items.children}>
+              {(item) => (
+                <div className="w-full h-20 bg-white">
+                  {item.map((e) => (
+                    <Draggable key={e} id={e}>
+                      <button className="bg-green-300">Drop me</button>
+                    </Draggable>
+                  ))}
+                </div>
+              )}
+            </Droppable>
+          ))}
+        </GridContainer>
+      </DndContext>
+    </div>
   );
 };
 

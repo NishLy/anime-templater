@@ -1,9 +1,10 @@
 import React, { ReactNode, useState, useRef, useEffect } from "react";
 
-interface MenuItem {
+export interface MenuItem {
   name: string;
   label: string;
-  cb: () => void;
+  cb?: () => void;
+  element?: ReactNode;
   icon?: string;
   disabled?: boolean;
 }
@@ -21,7 +22,6 @@ const DropdownContainer: React.FC<DropdownProps> = ({
   children,
   variant = "default",
   size = "md",
-  position = "bottom-right",
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -85,18 +85,18 @@ const DropdownContainer: React.FC<DropdownProps> = ({
     return `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]}`;
   };
 
-  const getMenuPosition = () => {
-    const positions = {
-      "bottom-right": "origin-top-right top-full right-0",
-      "bottom-left": "origin-top-left top-full left-0",
-      "top-right": "origin-bottom-right bottom-full right-0 mb-2",
-      "top-left": "origin-bottom-left bottom-full left-0 mb-2",
-    };
-    return positions[position];
-  };
+  // const getMenuPosition = () => {
+  //   const positions = {
+  //     "bottom-right": "origin-top-right top-full right-0",
+  //     "bottom-left": "origin-top-left top-full left-0",
+  //     "top-right": "origin-bottom-right bottom-full right-0 mb-2",
+  //     "top-left": "origin-bottom-left bottom-full left-0 mb-2",
+  //   };
+  //   return positions[position];
+  // };
 
   return (
-    <div className="relative inline-block" ref={dropdownRef}>
+    <div className="relative inline-block w-full" ref={dropdownRef}>
       {/* Dropdown button */}
       <button
         onClick={() => setOpen(!open)}
@@ -133,30 +133,25 @@ const DropdownContainer: React.FC<DropdownProps> = ({
 
       {/* Dropdown menu */}
       <div
-        className={`absolute z-20 mt-1 w-48 rounded-xl bg-white shadow-xl ring-1 ring-black/5 border border-gray-100 transition-all duration-200 ${
+        className={`absolute top-20 rounded-md w-72 shadow-2xl overflow-x-hidden max-h-[30rem] overflow-auto right-2 z-50 inline-flex bg-white border-gray-100 transition-all duration-200 ${
           open
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
-        } ${getMenuPosition()}`}
+        } `}
         role="menu"
         aria-orientation="vertical"
-        style={{
-          filter: "drop-shadow(0 10px 25px rgba(0, 0, 0, 0.1))",
-        }}
       >
-        <div className="py-2">
+        <div className="wrap-normal w-full">
           {items.length > 0 ? (
             items.map((item, index) => (
-              <button
+              <div
                 key={item.name}
                 onClick={() => {
                   if (!item.disabled) {
-                    item.cb();
-                    setOpen(false);
+                    item.cb?.();
                   }
                 }}
-                disabled={item.disabled}
-                className={`group flex items-center w-full px-4 py-2.5 text-sm transition-colors duration-150 ${
+                className={`group flex items-center w-full gap-2 px-4 py-2.5 text-sm transition-colors duration-150 ${
                   item.disabled
                     ? "text-gray-400 cursor-not-allowed"
                     : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-900"
@@ -169,8 +164,7 @@ const DropdownContainer: React.FC<DropdownProps> = ({
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
                     if (!item.disabled) {
-                      item.cb();
-                      setOpen(false);
+                      item.cb?.();
                     }
                   }
                 }}
@@ -181,22 +175,8 @@ const DropdownContainer: React.FC<DropdownProps> = ({
                 <span className="flex-1 text-left font-medium">
                   {item.label}
                 </span>
-                {!item.disabled && (
-                  <svg
-                    className="ml-2 w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity duration-150"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                )}
-              </button>
+                {item.element && <span className="w-20">{item.element}</span>}
+              </div>
             ))
           ) : (
             <div className="px-4 py-3 text-sm text-gray-500 text-center italic">
