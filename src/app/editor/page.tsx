@@ -2,6 +2,7 @@
 
 import Draggable from "@/components/dragable";
 import Droppable from "@/components/dropable";
+import GridContainer from "@/components/grid-container";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { useState } from "react";
 
@@ -56,25 +57,23 @@ const Editor = () => {
     }
   }
   return (
-    <div className="w-screen">
-      <DndContext onDragEnd={handleDragEnd}>
-        <div style={{ display: "flex", gap: "20px" }}>
-          {Object.entries(containers).map(([id, items]) => (
-            <Droppable<string> key={id} id={id} items={items.children}>
-              {(item) => (
-                <div className="w-24 h-24 bg-white">
-                  {item.map((e) => (
-                    <Draggable key={e} id={e}>
-                      <button className="bg-green-300">Drop me</button>
-                    </Draggable>
-                  ))}
-                </div>
-              )}
-            </Droppable>
-          ))}
-        </div>
-      </DndContext>
-    </div>
+    <DndContext onDragEnd={handleDragEnd}>
+      <GridContainer className="w-screen">
+        {Object.entries(containers).map(([id, items]) => (
+          <Droppable<string> key={id} id={id} items={items.children}>
+            {(item) => (
+              <div className="w-full h-20 bg-white">
+                {item.map((e) => (
+                  <Draggable key={e} id={e}>
+                    <button className="bg-green-300">Drop me</button>
+                  </Draggable>
+                ))}
+              </div>
+            )}
+          </Droppable>
+        ))}
+      </GridContainer>
+    </DndContext>
   );
 };
 
