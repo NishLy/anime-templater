@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import React, { ReactNode, useState, useRef, useEffect } from "react";
 
 export interface MenuItem {
@@ -15,6 +16,7 @@ interface DropdownProps {
   variant?: "default" | "primary" | "ghost";
   size?: "sm" | "md" | "lg";
   position?: "bottom-right" | "bottom-left" | "top-right" | "top-left";
+  className?: string;
 }
 
 const DropdownContainer: React.FC<DropdownProps> = ({
@@ -22,6 +24,7 @@ const DropdownContainer: React.FC<DropdownProps> = ({
   children,
   variant = "default",
   size = "md",
+  className,
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -96,7 +99,10 @@ const DropdownContainer: React.FC<DropdownProps> = ({
   // };
 
   return (
-    <div className="relative inline-block w-full" ref={dropdownRef}>
+    <div
+      className={classNames("relative inline-block w-full", className)}
+      ref={dropdownRef}
+    >
       {/* Dropdown button */}
       <button
         onClick={() => setOpen(!open)}

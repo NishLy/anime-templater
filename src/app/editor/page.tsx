@@ -3,7 +3,12 @@
 import Draggable from "@/components/dragable";
 import Droppable from "@/components/dropable";
 import GridContainer from "@/components/grid-container";
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from "@dnd-kit/core";
 import { useState } from "react";
 
 interface IContainer {
@@ -12,69 +17,151 @@ interface IContainer {
 }
 
 interface Wrapper {
-  [key: number | string]: IContainer;
+  [key: string]: IContainer;
 }
 
 const Editor = () => {
   const [containers, setContainers] = useState<Wrapper>({
-    1: {
-      children: ["first"],
+    "1": {
+      children: ["item-1", "item-2"],
       name: "A",
     },
-    2: {
-      children: [],
-      name: "b",
+    "2": {
+      children: ["item-3"],
+      name: "B",
     },
-    3: {
+    "3": {
       children: [],
-      name: "c",
+      name: "C",
     },
   });
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const [nextItemId, setNextItemId] = useState(4);
+  const [nextContainerId, setNextContainerId] = useState(4);
+
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id.toString());
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
+    setActiveId(null);
+
     if (!over) return;
 
-    const sourceId = Object.keys(containers).find((key) =>
-      containers[parseInt(key)].children.includes(active.id.toString())
+    const activeId = active.id.toString();
+    const overId = over.id.toString();
+
+    // Find source container
+    const sourceContainerEntry = Object.entries(containers).find(
+      ([_, container]) => container.children.includes(activeId)
     );
 
-    if (!sourceId) return;
+    if (!sourceContainerEntry) return;
 
-    const destId = over.id;
+    const [sourceId] = sourceContainerEntry;
+    const destId = overId;
 
-    if (sourceId && destId && sourceId !== destId) {
-      setContainers((prev) => {
-        const next = { ...prev };
-        next[sourceId].children = Array.from(
-          new Set(next[sourceId].children.filter((item) => item !== active.id))
-        );
-        next[destId].children = Array.from(
-          new Set([...next[destId].children, active.id.toString()])
-        );
-        return next;
-      });
-    }
+    // Don't do anything if dropping in the same container
+    if (sourceId === destId) return;
+
+    // Check if destination container exists
+    if (!containers[destId]) return;
+
+    setContainers((prev) => {
+      const next = { ...prev };
+
+      // Remove from source
+      next[sourceId] = {
+        ...next[sourceId],
+        children: next[sourceId].children.filter((item) => item !== activeId),
+      };
+
+      // Add to destination (avoid duplicates)
+      if (!next[destId].children.includes(activeId)) {
+        next[destId] = {
+          ...next[destId],
+          children: [...next[destId].children, activeId],
+        };
+      }
+
+      return next;
+    });
   }
+
+  const addNewContainer = () => {
+    const newId = nextContainerId.toString();
+    setContainers((prev) => ({
+      ...prev,
+      [newId]: {
+        children: [],
+        name: String.fromCharCode(65 + (nextContainerId - 1)), // A, B, C, D, etc.
+      },
+    }));
+    setNextContainerId((prev) => prev + 1);
+  };
+
+  const addNewItem = () => {
+    const newItemId = `item-${nextItemId}`;
+    const firstContainerId = Object.keys(containers)[0];
+
+    if (firstContainerId) {
+      setContainers((prev) => ({
+        ...prev,
+        [firstContainerId]: {
+          ...prev[firstContainerId],
+          children: [...prev[firstContainerId].children, newItemId],
+        },
+      }));
+      setNextItemId((prev) => prev + 1);
+    }
+  };
+
+  const removeContainer = (containerId: string) => {
+    if (Object.keys(containers).length <= 1) return; // Keep at least one container
+
+    setContainers((prev) => {
+      const next = { ...prev };
+      delete next[containerId];
+      return next;
+    });
+  };
+
   return (
-    <div className="bg-white min-h-screen">
-      <DndContext onDragEnd={handleDragEnd}>
-        <GridContainer className="w-full">
-          {Object.entries(containers).map(([id, items]) => (
-            <Droppable<string> key={id} id={id} items={items.children}>
-              {(item) => (
-                <div className="w-full h-20 bg-white">
-                  {item.map((e) => (
-                    <Draggable key={e} id={e}>
-                      <button className="bg-green-300">Drop me</button>
-                    </Draggable>
-                  ))}
+    <div className="bg-white min-h-screen p-4">
+      <div className="max-w-6xl mx-auto">
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <GridContainer className="w-full">
+            {Object.entries(containers).map(([id, container]) => (
+              <Droppable key={id} id={id} items={container.children}>
+                {(items) => (
+                  <>
+                    {items.map((itemId) => (
+                      <Draggable key={itemId} id={itemId}>
+                        <div className="bg-green-300 hover:bg-green-400 p-3 rounded-md shadow-sm cursor-grab active:cursor-grabbing transition-colors">
+                          <div className="text-sm font-medium text-green-800">
+                            {itemId}
+                          </div>
+                        </div>
+                      </Draggable>
+                    ))}
+                  </>
+                )}
+              </Droppable>
+            ))}
+          </GridContainer>
+          <DragOverlay>
+            {activeId ? (
+              <div className="bg-green-300 p-3 rounded-md shadow-lg rotate-3 opacity-80">
+                <div className="text-sm font-medium text-green-800">
+                  {activeId}
                 </div>
-              )}
-            </Droppable>
-          ))}
-        </GridContainer>
-      </DndContext>
+              </div>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </div>
     </div>
   );
 };

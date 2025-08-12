@@ -13,7 +13,10 @@ export interface IStateCustomizable extends CSSProperties {
 
 const CustomizableContainer = (props: ICustomizableContainer) => {
   return (
-    <div className={classNames(props.className, "w-full")} style={props.style}>
+    <div
+      className={classNames(props.className, "w-full h-full")}
+      style={props.style}
+    >
       {props.children}
     </div>
   );
