@@ -3,13 +3,12 @@ import classNames from "classnames";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import DropdownContainer from "./dropdown-container";
-import { useState } from "react";
+import { ReactNode, useState } from "react";
 import useComponentMenus from "@/utils/component-menus";
 
 interface IDroppable<T> {
-  children: (items: T[]) => React.ReactNode;
+  children: ReactNode;
   id: string;
-  items: T[];
 }
 
 function Droppable<T>(props: IDroppable<T>) {
@@ -53,8 +52,7 @@ function Droppable<T>(props: IDroppable<T>) {
         )}
       >
         <CustomizableContainer>
-          {props.children(props.items)}
-          {props.items.length == 0 && !node && (
+          {!props.children && !node && (
             <div className="w-full h-full text-center">dropable</div>
           )}
           {node}
