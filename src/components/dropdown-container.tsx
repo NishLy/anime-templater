@@ -1,5 +1,6 @@
 import classNames from "classnames";
 import React, { ReactNode, useState, useRef, useEffect } from "react";
+import { IoMdAdd } from "react-icons/io";
 
 export interface MenuItem {
   name: string;
@@ -11,7 +12,8 @@ export interface MenuItem {
 }
 
 interface DropdownProps {
-  menus: MenuItem[];
+  menusAdd: MenuItem[];
+  menusMore: MenuItem[];
   children: ReactNode;
   variant?: "default" | "primary" | "ghost";
   size?: "sm" | "md" | "lg";
@@ -20,51 +22,18 @@ interface DropdownProps {
 }
 
 const DropdownContainer: React.FC<DropdownProps> = ({
-  menus: items,
+  menusAdd,
+  menusMore: items,
   children,
   variant = "default",
   size = "md",
   className,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState<{ add: boolean; more: boolean }>({
+    add: false,
+    more: false,
+  });
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [open]);
-
-  // Handle escape key
-  useEffect(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    };
-
-    if (open) {
-      document.addEventListener("keydown", handleEscape);
-    }
-
-    return () => {
-      document.removeEventListener("keydown", handleEscape);
-    };
-  }, [open]);
 
   const getButtonStyles = () => {
     const baseStyles =
@@ -88,59 +57,144 @@ const DropdownContainer: React.FC<DropdownProps> = ({
     return `${baseStyles} ${sizeStyles[size]} ${variantStyles[variant]}`;
   };
 
-  // const getMenuPosition = () => {
-  //   const positions = {
-  //     "bottom-right": "origin-top-right top-full right-0",
-  //     "bottom-left": "origin-top-left top-full left-0",
-  //     "top-right": "origin-bottom-right bottom-full right-0 mb-2",
-  //     "top-left": "origin-bottom-left bottom-full left-0 mb-2",
-  //   };
-  //   return positions[position];
-  // };
-
   return (
     <div
       className={classNames("relative inline-block w-full", className)}
       ref={dropdownRef}
     >
       {/* Dropdown button */}
-      <button
-        onClick={() => setOpen(!open)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") {
-            e.preventDefault();
-            setOpen(!open);
+      <div className="absolute top-2 right-2 z-10 flex gap-2">
+        <button
+          onClick={() =>
+            setOpen({
+              ...open,
+              add: true,
+            })
           }
-        }}
-        className={`absolute top-2 right-2 z-10 ${getButtonStyles()}`}
-        aria-haspopup="true"
-        aria-expanded={open}
-        aria-label="Open menu"
-      >
-        <svg
-          className={`w-4 h-4 transition-transform duration-200 ${
-            open ? "rotate-90" : ""
-          }`}
-          fill="currentColor"
-          viewBox="0 0 20 20"
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen({
+                ...open,
+                add: !open.add,
+              });
+            }
+          }}
+          className={`opacity-25 hover:opacity-100 ${getButtonStyles()}`}
+          aria-haspopup="true"
+          aria-expanded={open.add}
+          aria-label="Open menu"
         >
-          <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
-        </svg>
-      </button>
+          <IoMdAdd />
+        </button>
+        <button
+          onClick={() =>
+            setOpen({
+              ...open,
+              more: true,
+            })
+          }
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              setOpen({
+                ...open,
+                more: !open.more,
+              });
+            }
+          }}
+          className={`opacity-25 hover:opacity-100 ${getButtonStyles()}`}
+          aria-haspopup="true"
+          aria-expanded={open.more}
+          aria-label="Open menu"
+        >
+          <svg
+            className={`w-4 h-4 transition-transform duration-200 ${
+              open ? "rotate-90" : ""
+            }`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+          </svg>
+        </button>
+      </div>
 
       {/* Backdrop */}
-      {open && (
+      {open.add && (
         <div
           className="fixed inset-0 z-10"
-          onClick={() => setOpen(false)}
+          onClick={() => setOpen({ ...open, add: false })}
+          aria-hidden="true"
+        />
+      )}
+      {/* Backdrop */}
+      {open.more && (
+        <div
+          className="fixed inset-0 z-10"
+          onClick={() => setOpen({ ...open, more: false })}
           aria-hidden="true"
         />
       )}
 
-      {/* Dropdown menu */}
       <div
         className={`absolute top-20 rounded-md w-72 shadow-2xl overflow-x-hidden max-h-[30rem] overflow-auto right-2 z-50 inline-flex bg-white border-gray-100 transition-all duration-200 ${
-          open
+          open.add
+            ? "opacity-100 scale-100 translate-y-0"
+            : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
+        } `}
+        role="menu"
+        aria-orientation="vertical"
+      >
+        <div className="wrap-normal w-full">
+          {menusAdd?.length > 0 ? (
+            menusAdd?.map((item, index) => (
+              <div
+                key={item.name}
+                onClick={() => {
+                  if (!item.disabled) {
+                    item.cb?.();
+                  }
+                }}
+                className={`group flex items-center w-full gap-2 px-4 py-2.5 text-sm transition-colors duration-150 ${
+                  item.disabled
+                    ? "text-gray-400 cursor-not-allowed"
+                    : "text-gray-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 hover:text-blue-900"
+                } ${index === 0 ? "rounded-t-lg" : ""} ${
+                  index === items.length - 1 ? "rounded-b-lg" : ""
+                }`}
+                role="menuitem"
+                tabIndex={item.disabled ? -1 : 0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    if (!item.disabled) {
+                      item.cb?.();
+                    }
+                  }
+                }}
+              >
+                {item.icon && (
+                  <span className="mr-3 text-base">{item.icon}</span>
+                )}
+                <span className="flex-1 text-left font-medium">
+                  {item.label}
+                </span>
+                {item.element && <span className="w-20">{item.element}</span>}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-3 text-sm text-gray-500 text-center italic">
+              No items available
+            </div>
+          )}
+        </div>
+      </div>
+      {/* Dropdown menu for more menu*/}
+
+      <div
+        className={`absolute top-20 rounded-md w-72 shadow-2xl overflow-x-hidden max-h-[30rem] overflow-auto right-2 z-50 inline-flex bg-white border-gray-100 transition-all duration-200 ${
+          open.more
             ? "opacity-100 scale-100 translate-y-0"
             : "opacity-0 scale-95 -translate-y-2 pointer-events-none"
         } `}

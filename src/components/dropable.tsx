@@ -22,7 +22,7 @@ function Droppable<T>(props: IDroppable<T>) {
 
   return (
     <DropdownContainer
-      menus={[
+      menusMore={[
         {
           label: "Cols Span",
           name: "borderStyle",
@@ -40,6 +40,7 @@ function Droppable<T>(props: IDroppable<T>) {
         },
         ...menus,
       ]}
+      menusAdd={[]}
       className={colspan}
     >
       <div
