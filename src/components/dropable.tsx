@@ -4,6 +4,7 @@ import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import DropdownContainer from "./dropdown-container";
 import { useState } from "react";
+import useComponentMenus from "@/utils/component-menus";
 
 interface IDroppable<T> {
   children: (items: T[]) => React.ReactNode;
@@ -17,6 +18,7 @@ function Droppable<T>(props: IDroppable<T>) {
   });
 
   const [menus, style] = useCustomizationMenus();
+  const [components, node] = useComponentMenus();
 
   const [colspan, setColspan] = useState("cols-span-1");
 
@@ -40,7 +42,7 @@ function Droppable<T>(props: IDroppable<T>) {
         },
         ...menus,
       ]}
-      menusAdd={[]}
+      menusAdd={components}
       className={colspan}
     >
       <div
@@ -52,9 +54,10 @@ function Droppable<T>(props: IDroppable<T>) {
       >
         <CustomizableContainer>
           {props.children(props.items)}
-          {props.items.length == 0 && (
+          {props.items.length == 0 && !node && (
             <div className="w-full h-full text-center">dropable</div>
           )}
+          {node}
         </CustomizableContainer>
       </div>
     </DropdownContainer>
