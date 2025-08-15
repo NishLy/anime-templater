@@ -15,18 +15,8 @@ interface IGridContainer {
 }
 const GridContainer = (props: IGridContainer) => {
   const [menus, style] = useCustomizationMenus();
-  const [components, node, reset] = useComponentMenus();
 
   const dispatch = useDispatch();
-  useEffect(() => {
-    // setNodes([...nodes, { key: randomBase64(16), node }]);
-    if (node.key) {
-      dispatch(
-        add({ parentKey: props.id, key: randomBase64(16), node: node.node })
-      );
-      reset();
-    }
-  }, [node.key]);
 
   const handleAddContainer = () => {
     dispatch(
@@ -37,7 +27,6 @@ const GridContainer = (props: IGridContainer) => {
         dragable: false,
       })
     );
-    reset();
   };
 
   return (
@@ -49,7 +38,6 @@ const GridContainer = (props: IGridContainer) => {
           name: "container",
           cb: handleAddContainer,
         },
-        ...components,
       ]}
     >
       <CustomizableContainer

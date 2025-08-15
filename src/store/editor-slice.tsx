@@ -32,28 +32,52 @@ const editorSlice = createSlice({
   reducers: {
     dragEnd: (state, actions) => {
       const activeId = actions.payload.activeId as string;
+      const activeSegments = activeId.split(".");
       const overId = actions.payload.overId;
-      const key = activeId.split(".").pop();
-      if (!key) return;
-      // Find source container
-      const sourceContainerEntry = getNested(state.contents, activeId);
+      const overSegment = overId.split(".");
 
-      if (!sourceContainerEntry) return;
+      let movingNode: ElementSchema;
 
-      const [sourceId] = sourceContainerEntry;
-      const destId = overId;
+      const oldParentState = setNestedImmutable(
+        state.contents,
+        activeSegments.slice(0, -1).join("."),
+        (node, parentKey) => {
+          node.props!.children = node.props?.children?.filter((e) => {
+            if (e instanceof ElementSchema) {
+              if (e.key === activeSegments[activeSegments.length - 1]) {
+                movingNode = e;
+                return false;
+              }
+            }
 
-      // Don't do anything if dropping in the same container
-      if (sourceId === destId) return;
+            return true;
+          });
 
-      // Check if destination container exists
-      if (!state.contents[destId]) return;
+          return node;
+        }
+      );
 
-      // Remove from source
-      deleteNested(state.contents, sourceId);
+      const newParentState = setNestedImmutable(
+        oldParentState,
+        overId,
+        (node, parentKey) => {
+          if (!node.props) {
+            node.props = {
+              children: [],
+            };
+          }
 
-      // Add to destination (avoid duplicates)
-      createNested(state.contents, overId + "." + key);
+          if (!node.props?.children) {
+            node.props.children = [];
+          }
+
+          node.props!.children = [...node.props?.children, movingNode];
+
+          return node;
+        }
+      );
+
+      state.contents = newParentState;
     },
     add(state, actions) {
       const { key, parentKey, node, dragable = true } = actions.payload;

@@ -40,7 +40,7 @@ const Editor = () => {
       <div className="max-w-6xl mx-auto">
         <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           <Render contents={contents} />
-          <DragOverlay>
+          {/* <DragOverlay>
             {activeId ? (
               <div className="bg-green-300 p-3 rounded-md shadow-lg rotate-3 opacity-80">
                 <div className="text-sm font-medium text-green-800">
@@ -48,7 +48,7 @@ const Editor = () => {
                 </div>
               </div>
             ) : null}
-          </DragOverlay>
+          </DragOverlay> */}
         </DndContext>
       </div>
     </div>

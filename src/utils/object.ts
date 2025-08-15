@@ -80,7 +80,8 @@ export function deleteNested(obj: any, path: string) {
 export function setNestedImmutable(
   arr: ElementNodes,
   path: string,
-  updater: (node: ElementSchema) => ElementSchema
+  updater: (node: ElementSchema, parentKey?: string) => ElementSchema,
+  parentKey?: string
 ): ElementNodes {
   const segments = path.split(".");
   if (segments.length === 0) return arr;
@@ -93,7 +94,7 @@ export function setNestedImmutable(
 
       if (objSegments[objSegments.length - 1] === currentKey) {
         if (rest.length === 0) {
-          return updater(obj); // return updated node
+          return updater(obj, parentKey); // return updated node
         }
         if (obj.props?.children) {
           return new ElementSchema(obj.type, obj.key, {
@@ -101,7 +102,8 @@ export function setNestedImmutable(
             children: setNestedImmutable(
               obj.props.children,
               rest.join("."),
-              updater
+              updater,
+              currentKey
             ),
           });
         }
