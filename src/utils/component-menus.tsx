@@ -5,13 +5,13 @@ import { closeModal, setModal } from "@/store/modal-slice";
 import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { randomBase64 } from "./hash";
-import GridContainer from "@/components/extensions/grid-container";
 import ComponentRegistry from "@/registry/components";
 
 const useComponentMenus = (): [
   MenuItem[],
   { key?: string; node: keyof typeof ComponentRegistry | undefined },
-  reset: () => void
+  reset: () => void,
+  set: (arg: keyof typeof ComponentRegistry) => void
 ] => {
   const [currentNode, setCurrentNode] = useState<
     keyof typeof ComponentRegistry | undefined
@@ -60,6 +60,7 @@ const useComponentMenus = (): [
       node: currentNode,
     },
     () => setCurrentNode(undefined),
+    (arg) => setCurrentNode(arg),
   ];
 };
 

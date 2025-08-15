@@ -15,9 +15,10 @@ interface EditorState {
 
 const initialState: EditorState = {
   contents: [
-    new ElementSchema("dropable", "drop-a", {
+    new ElementSchema("grid", "main-container", {
+      id: "base-container",
       children: [
-        new ElementSchema("dragable", "dragable-1", {
+        new ElementSchema("dropable", "drop-a", {
           children: [],
         }),
       ],
@@ -55,11 +56,13 @@ const editorSlice = createSlice({
       createNested(state.contents, overId + "." + key);
     },
     add(state, actions) {
-      const { key, parentKey, node } = actions.payload;
+      const { key, parentKey, node, dragable = true } = actions.payload;
 
-      const dragableSchema = new ElementSchema("dragable", key, {
-        children: [new ElementSchema(node, key)],
-      });
+      const dragableSchema = dragable
+        ? new ElementSchema("dragable", key, {
+            children: [new ElementSchema(node, key)],
+          })
+        : new ElementSchema(node, key);
 
       const newState = setNestedImmutable(state.contents, parentKey, (node) => {
         if (!node.props) {

@@ -1,19 +1,57 @@
 import classNames from "classnames";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import useComponentMenus from "@/utils/component-menus";
 import DropdownContainer from "./dropdown-container";
+import { useDispatch } from "react-redux";
+import { add } from "@/store/editor-slice";
+import { randomBase64 } from "@/utils/hash";
 
 interface IGridContainer {
   className?: string;
   children: ReactNode;
+  id: string;
 }
 const GridContainer = (props: IGridContainer) => {
   const [menus, style] = useCustomizationMenus();
-  const [components, node] = useComponentMenus();
+  const [components, node, reset] = useComponentMenus();
+
+  const dispatch = useDispatch();
+  useEffect(() => {
+    // setNodes([...nodes, { key: randomBase64(16), node }]);
+    if (node.key) {
+      dispatch(
+        add({ parentKey: props.id, key: randomBase64(16), node: node.node })
+      );
+      reset();
+    }
+  }, [node.key]);
+
+  const handleAddContainer = () => {
+    dispatch(
+      add({
+        parentKey: props.id,
+        key: randomBase64(16),
+        node: "dropable",
+        dragable: false,
+      })
+    );
+    reset();
+  };
+
   return (
-    <DropdownContainer menusMore={menus} menusAdd={components}>
+    <DropdownContainer
+      menusMore={menus}
+      menusAdd={[
+        {
+          label: "container",
+          name: "container",
+          cb: handleAddContainer,
+        },
+        ...components,
+      ]}
+    >
       <CustomizableContainer
         className={classNames(
           props.className,

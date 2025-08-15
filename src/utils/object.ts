@@ -88,19 +88,23 @@ export function setNestedImmutable(
   const [currentKey, ...rest] = segments;
 
   return arr.map((obj) => {
-    if (obj instanceof ElementSchema && obj.key === currentKey) {
-      if (rest.length === 0) {
-        return updater(obj); // return updated node
-      }
-      if (obj.props?.children) {
-        return new ElementSchema(obj.type, obj.key, {
-          ...obj.props,
-          children: setNestedImmutable(
-            obj.props.children,
-            rest.join("."),
-            updater
-          ),
-        });
+    if (obj instanceof ElementSchema) {
+      const objSegments = (obj?.key ?? "").split(".");
+
+      if (objSegments[objSegments.length - 1] === currentKey) {
+        if (rest.length === 0) {
+          return updater(obj); // return updated node
+        }
+        if (obj.props?.children) {
+          return new ElementSchema(obj.type, obj.key, {
+            ...obj.props,
+            children: setNestedImmutable(
+              obj.props.children,
+              rest.join("."),
+              updater
+            ),
+          });
+        }
       }
     }
     return obj; // unchanged

@@ -21,18 +21,16 @@ const renderRecursive = (
     }
 
     const Component = ComponentRegistry[e.type];
-    // Always render children — even if it's a string or number
-    const children = e.props?.children
-      ? Array.isArray(e.props.children)
-        ? renderRecursive(e.props.children, e.key)
-        : e.props.children
-      : null;
 
     const key = parentKey ? `${parentKey}.${e.key}` : e.key;
 
     return (
-      <Component key={key} id={e.key || i}>
-        {children}
+      <Component key={key} id={key}>
+        {e.props?.children
+          ? Array.isArray(e.props.children)
+            ? renderRecursive(e.props.children, key)
+            : e.props.children
+          : null}
       </Component>
     );
   });

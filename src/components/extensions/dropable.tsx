@@ -40,7 +40,7 @@ function Droppable<T>(props: IDroppable) {
       menusMore={[
         {
           label: "Cols Span",
-          name: "borderStyle",
+          name: "span",
           element: (
             <select
               onChange={(e) => setColspan(e.target.value)}

@@ -39,9 +39,7 @@ const Editor = () => {
     <div className="bg-white min-h-screen p-4">
       <div className="max-w-6xl mx-auto">
         <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-          <GridContainer className="w-full">
-            <Render contents={contents} />
-          </GridContainer>
+          <Render contents={contents} />
           <DragOverlay>
             {activeId ? (
               <div className="bg-green-300 p-3 rounded-md shadow-lg rotate-3 opacity-80">
