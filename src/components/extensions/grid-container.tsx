@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import DropdownContainer from "./core/dropdown-container";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import { ReactNode } from "react";
 import useComponentMenus from "@/utils/component-menus";
+import DropdownContainer from "./dropdown-container";
 
 interface IGridContainer {
   className?: string;

@@ -63,11 +63,7 @@ function Droppable<T>(props: IDroppable) {
           " text-black shadow-md flex items-center justify-center bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-4 min-h-32 hover:border-gray-400 transition-colors"
         )}
       >
-        <CustomizableContainer>
-          {!props.children && !node && (
-            <div className="w-full h-full text-center">dropable</div>
-          )}
-        </CustomizableContainer>
+        <CustomizableContainer>{props.children}</CustomizableContainer>
       </div>
     </DropdownContainer>
   );

@@ -1,16 +1,16 @@
 "use client";
 
-import Droppable from "@/components/dropable";
-import GridContainer from "@/components/grid-container";
+import Render from "@/components/core/renderer";
+import GridContainer from "@/components/extensions/grid-container";
 import { RootState } from "@/store";
-import { dragEnd, Wrapper } from "@/store/editor-slice";
+import { dragEnd } from "@/store/editor-slice";
 import {
   DndContext,
   DragEndEvent,
   DragOverlay,
   DragStartEvent,
 } from "@dnd-kit/core";
-import { isValidElement, useState } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Editor = () => {

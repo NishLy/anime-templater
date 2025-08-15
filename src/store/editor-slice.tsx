@@ -15,6 +15,10 @@ const initialState: EditorState = {
         new ElementSchema("text", "text-a", {
           children: ["Drop Here"],
         }),
+        new ElementSchema("text", "text-b", {
+          className: "text-black",
+          children: ["Drop there"],
+        }),
       ],
     }),
   ],
