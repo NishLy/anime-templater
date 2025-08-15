@@ -10,7 +10,7 @@ import {
   DragOverlay,
   DragStartEvent,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { cloneElement, isValidElement, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 interface IRender {
@@ -20,17 +20,19 @@ interface IRender {
 const Render = (props: IRender) => {
   return (
     <>
-      {Object.entries(props.contents).map(([id, container]) =>
-        container.dropable ? (
-          <Droppable key={id} id={id}>
+      {Object.entries(props.contents).map(([id, container]) => {
+        // Prepare children nodes to inject
+        const children = container.dropable ? (
+          <Droppable id={id}>
             {container.children && <Render contents={container.children} />}
           </Droppable>
         ) : (
-          container.children && (
-            <Render key={id} contents={container.children} />
-          )
-        )
-      )}
+          container.children && <Render contents={container.children} />
+        );
+
+        // clone with key and injected children
+        return children;
+      })}
     </>
   );
 };

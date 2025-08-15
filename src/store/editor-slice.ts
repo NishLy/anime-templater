@@ -5,8 +5,8 @@ import { ReactNode } from "react";
 
 interface IContainer {
   children?: Wrapper;
-  name: string;
-  dropable: boolean;
+  name?: string;
+  dropable?: boolean;
 }
 
 export interface Wrapper {
@@ -20,7 +20,7 @@ interface EditorState {
 const initialState: EditorState = {
   contents: {
     new: {
-      name: "new-child",
+      name: "dropable-1",
       dropable: true,
     },
   },
@@ -84,7 +84,9 @@ const editorSlice = createSlice({
     add(state, actions) {
       const key = actions.payload.key;
       const parentKey = actions.payload.parentKey;
-      createNested(state.contents, parentKey + "." + key);
+      const node = actions.payload.node;
+      createNested(state.contents, parentKey + ".children." + key);
+      getNested(state.contents, parentKey + ".children." + key).node = node;
     },
     remove(state, actions) {
       const key = actions.payload.key;

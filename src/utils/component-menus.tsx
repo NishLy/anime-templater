@@ -3,12 +3,16 @@ import { MenuItem } from "@/components/dropdown-container";
 import GridContainer from "@/components/grid-container";
 import ImagePickerModal from "@/components/modal/image-picker";
 import { closeModal, setModal } from "@/store/modal-slice";
-import { ReactNode, useMemo, useState } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { randomBase64 } from "./hash";
 
-const useComponentMenus = (): [MenuItem[], ReactNode?] => {
+const useComponentMenus = (): [
+  MenuItem[],
+  { key?: string; node: ReactNode }
+] => {
   const [currentNode, setCurrentNode] = useState<ReactNode>();
+  const [key, setKey] = useState<string | undefined>();
 
   const keyMenu = useMemo(() => randomBase64(16), []);
 
@@ -24,6 +28,12 @@ const useComponentMenus = (): [MenuItem[], ReactNode?] => {
       />
     );
   };
+
+  useEffect(() => {
+    if (currentNode) {
+      setKey(randomBase64(16));
+    }
+  }, [currentNode]);
 
   return [
     [
@@ -50,9 +60,14 @@ const useComponentMenus = (): [MenuItem[], ReactNode?] => {
         },
       },
     ],
-    <Draggable id={keyMenu} key={keyMenu}>
-      {currentNode}
-    </Draggable>,
+    {
+      key,
+      node: (
+        <Draggable id={keyMenu} key={keyMenu}>
+          {currentNode}
+        </Draggable>
+      ),
+    },
   ];
 };
 

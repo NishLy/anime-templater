@@ -3,6 +3,7 @@ import DropdownContainer from "./dropdown-container";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import { ReactNode } from "react";
+import useComponentMenus from "@/utils/component-menus";
 
 interface IGridContainer {
   className?: string;
@@ -10,8 +11,9 @@ interface IGridContainer {
 }
 const GridContainer = (props: IGridContainer) => {
   const [menus, style] = useCustomizationMenus();
+  const [components, node] = useComponentMenus();
   return (
-    <DropdownContainer menusMore={menus}>
+    <DropdownContainer menusMore={menus} menusAdd={components}>
       <CustomizableContainer
         className={classNames(
           props.className,

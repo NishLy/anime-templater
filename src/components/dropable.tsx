@@ -3,8 +3,11 @@ import classNames from "classnames";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import DropdownContainer from "./dropdown-container";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import useComponentMenus from "@/utils/component-menus";
+import { useDispatch } from "react-redux";
+import { randomBase64 } from "@/utils/hash";
+import { add } from "@/store/editor-slice";
 
 interface IDroppable<T> {
   children: ReactNode;
@@ -12,14 +15,23 @@ interface IDroppable<T> {
 }
 
 function Droppable<T>(props: IDroppable<T>) {
+  const dispatch = useDispatch();
   const { isOver, setNodeRef } = useDroppable({
     id: props.id,
   });
 
+  // const [nodes, setNodes] = useState<{ node: ReactNode; key: string }[]>([]);
   const [menus, style] = useCustomizationMenus();
   const [components, node] = useComponentMenus();
-
   const [colspan, setColspan] = useState("cols-span-1");
+
+  useEffect(() => {
+    // setNodes([...nodes, { key: randomBase64(16), node }]);
+    if (node.key)
+      dispatch(
+        add({ parentKey: props.id, key: randomBase64(16), node: node.node })
+      );
+  }, [node.key]);
 
   return (
     <DropdownContainer
@@ -55,7 +67,6 @@ function Droppable<T>(props: IDroppable<T>) {
           {!props.children && !node && (
             <div className="w-full h-full text-center">dropable</div>
           )}
-          {node}
         </CustomizableContainer>
       </div>
     </DropdownContainer>
