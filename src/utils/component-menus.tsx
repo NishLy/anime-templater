@@ -6,27 +6,22 @@ import { ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch } from "react-redux";
 import { randomBase64 } from "./hash";
 import GridContainer from "@/components/extensions/grid-container";
+import ComponentRegistry from "@/registry/components";
 
 const useComponentMenus = (): [
   MenuItem[],
-  { key?: string; node: ReactNode }
+  { key?: string; node: keyof typeof ComponentRegistry | undefined },
+  reset: () => void
 ] => {
-  const [currentNode, setCurrentNode] = useState<ReactNode>();
+  const [currentNode, setCurrentNode] = useState<
+    keyof typeof ComponentRegistry | undefined
+  >();
   const [key, setKey] = useState<string | undefined>();
-
-  const keyMenu = useMemo(() => randomBase64(16), []);
 
   const dispatch = useDispatch();
 
   const handlePickImage = (src: string) => {
     dispatch(closeModal());
-    return setCurrentNode(
-      <img
-        src={src}
-        alt="picked-image"
-        className="w-full h-full object-cover "
-      />
-    );
   };
 
   useEffect(() => {
@@ -40,12 +35,12 @@ const useComponentMenus = (): [
       {
         label: "Grid",
         name: "grid",
-        cb: () =>
-          setCurrentNode(
-            <GridContainer>
-              <></>
-            </GridContainer>
-          ),
+        cb: () => setCurrentNode("grid"),
+      },
+      {
+        label: "Text",
+        name: "text",
+        cb: () => setCurrentNode("text"),
       },
       {
         label: "Image",
@@ -62,12 +57,9 @@ const useComponentMenus = (): [
     ],
     {
       key,
-      node: (
-        <Draggable id={keyMenu} key={keyMenu}>
-          {currentNode}
-        </Draggable>
-      ),
+      node: currentNode,
     },
+    () => setCurrentNode(undefined),
   ];
 };
 

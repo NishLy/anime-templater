@@ -1,7 +1,14 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // store/modalSlice.ts
 import { ElementNodes, ElementSchema } from "@/type/schema";
-import { getNested, deleteNested, createNested } from "@/utils/object";
+import {
+  getNested,
+  deleteNested,
+  createNested,
+  getNestedSchema,
+  setNestedSchema,
+  setNestedImmutable,
+} from "@/utils/object";
 import { createSlice } from "@reduxjs/toolkit";
 
 interface EditorState {
@@ -12,12 +19,12 @@ const initialState: EditorState = {
   contents: [
     new ElementSchema("dropable", "drop-a", {
       children: [
-        new ElementSchema("text", "text-a", {
-          children: ["Drop Here"],
-        }),
-        new ElementSchema("text", "text-b", {
-          className: "text-black",
-          children: ["Drop there"],
+        new ElementSchema("dragable", "dragable-1", {
+          children: [
+            new ElementSchema("text", "text-a", {
+              children: ["Drop Here"],
+            }),
+          ],
         }),
       ],
     }),
@@ -56,14 +63,27 @@ const editorSlice = createSlice({
     add(state, actions) {
       const { key, parentKey, node } = actions.payload;
 
-      createNested(state.contents, parentKey + ".children");
+      const dragableSchema = new ElementSchema("dragable", key, {
+        children: [new ElementSchema(node, key)],
+      });
 
-      const parentChildren = getNested(state.contents, parentKey + ".children");
+      const newState = setNestedImmutable(state.contents, parentKey, (node) => {
+        if (!node.props) {
+          node.props = {
+            children: [],
+          };
+        }
 
-      // Remove `key` from the node if it exists
-      const { key: _, ...cleanNode } = node;
+        if (!node.props?.children) {
+          node.props.children = [];
+        }
 
-      parentChildren[key] = cleanNode;
+        node.props!.children = [...node.props!.children, dragableSchema];
+
+        return node;
+      });
+
+      state.contents = newState;
     },
     remove(state, actions) {
       const key = actions.payload.key;

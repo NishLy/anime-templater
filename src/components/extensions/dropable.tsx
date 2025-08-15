@@ -22,15 +22,17 @@ function Droppable<T>(props: IDroppable) {
 
   // const [nodes, setNodes] = useState<{ node: ReactNode; key: string }[]>([]);
   const [menus, style] = useCustomizationMenus();
-  const [components, node] = useComponentMenus();
+  const [components, node, reset] = useComponentMenus();
   const [colspan, setColspan] = useState("cols-span-1");
 
   useEffect(() => {
     // setNodes([...nodes, { key: randomBase64(16), node }]);
-    if (node.key)
+    if (node.key) {
       dispatch(
         add({ parentKey: props.id, key: randomBase64(16), node: node.node })
       );
+      reset();
+    }
   }, [node.key]);
 
   return (

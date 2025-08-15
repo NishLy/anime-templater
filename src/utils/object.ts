@@ -1,5 +1,58 @@
+import { ElementNodes, ElementSchema } from "@/type/schema";
+
 export function getNested(obj: any, path: string) {
   return path.split(".").reduce((acc, key) => acc?.[key], obj);
+}
+
+export function getNestedSchema(arr: ElementNodes, path: string) {
+  const segments = path.split(".");
+  if (segments.length === 0) return null;
+
+  const [currentKey, ...rest] = segments;
+
+  for (const obj of arr) {
+    if (obj instanceof ElementSchema && obj.key === currentKey) {
+      if (rest.length === 0) {
+        // Found the target schema
+        return obj;
+      }
+      if (obj.props?.children) {
+        // Search deeper
+        return getNestedSchema(obj.props.children, rest.join("."));
+      }
+      return null;
+    }
+  }
+
+  return null; // Not found
+}
+
+export function setNestedSchema(
+  arr: ElementNodes,
+  path: string,
+  updater: (node: ElementSchema) => void
+): boolean {
+  const segments = path.split(".");
+  if (segments.length === 0) return false;
+
+  const [currentKey, ...rest] = segments;
+
+  for (const obj of arr) {
+    if (obj instanceof ElementSchema && obj.key === currentKey) {
+      if (rest.length === 0) {
+        // Apply update to the found node
+        updater(obj);
+        return true;
+      }
+      if (obj.props?.children) {
+        // Continue deeper
+        return setNestedSchema(obj.props.children, rest.join("."), updater);
+      }
+      return false;
+    }
+  }
+
+  return false; // Not found
 }
 
 export function createNested(obj: any, path: string) {
@@ -22,4 +75,34 @@ export function deleteNested(obj: any, path: string) {
     return true; // deleted successfully
   }
   return false; // nothing to delete
+}
+
+export function setNestedImmutable(
+  arr: ElementNodes,
+  path: string,
+  updater: (node: ElementSchema) => ElementSchema
+): ElementNodes {
+  const segments = path.split(".");
+  if (segments.length === 0) return arr;
+
+  const [currentKey, ...rest] = segments;
+
+  return arr.map((obj) => {
+    if (obj instanceof ElementSchema && obj.key === currentKey) {
+      if (rest.length === 0) {
+        return updater(obj); // return updated node
+      }
+      if (obj.props?.children) {
+        return new ElementSchema(obj.type, obj.key, {
+          ...obj.props,
+          children: setNestedImmutable(
+            obj.props.children,
+            rest.join("."),
+            updater
+          ),
+        });
+      }
+    }
+    return obj; // unchanged
+  });
 }

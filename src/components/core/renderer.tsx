@@ -6,7 +6,10 @@ interface IRender {
   contents: ElementNodes;
 }
 
-const renderRecursive = (arr: ElementNodes): React.ReactNode[] => {
+const renderRecursive = (
+  arr: ElementNodes,
+  parentKey?: string
+): React.ReactNode[] => {
   return arr.map((e, i) => {
     if (isValidElement(e)) {
       return cloneElement(e, { key: e.key || i });
@@ -21,11 +24,17 @@ const renderRecursive = (arr: ElementNodes): React.ReactNode[] => {
     // Always render children — even if it's a string or number
     const children = e.props?.children
       ? Array.isArray(e.props.children)
-        ? renderRecursive(e.props.children)
+        ? renderRecursive(e.props.children, e.key)
         : e.props.children
       : null;
 
-    return <Component key={e.key || i}>{children}</Component>;
+    const key = parentKey ? `${parentKey}.${e.key}` : e.key;
+
+    return (
+      <Component key={key} id={e.key || i}>
+        {children}
+      </Component>
+    );
   });
 };
 
