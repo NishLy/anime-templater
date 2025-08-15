@@ -1,14 +1,21 @@
 import ComponentRegistry from "@/registry/components";
 
-export interface ElementSchema {
-  key: string;
-  props?: {
-    children: ElementNodes;
-    [key: string]: unknown;
-  };
-  type: keyof typeof ComponentRegistry;
+export class ElementSchema {
+  constructor(
+    public type: keyof typeof ComponentRegistry,
+    public key?: string,
+    public props?: {
+      children?: ElementNodes;
+      [key: string]: unknown;
+    }
+  ) {}
 }
 
-export interface ElementNodes {
-  [key: string]: ElementSchema;
-}
+export type ElementNodes = (
+  | ElementSchema
+  | string
+  | number
+  | null
+  | undefined
+  | boolean
+)[];

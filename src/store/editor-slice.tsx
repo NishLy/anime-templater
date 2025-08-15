@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // store/modalSlice.ts
-import { ElementNodes } from "@/type/schema";
+import { ElementNodes, ElementSchema } from "@/type/schema";
 import { getNested, deleteNested, createNested } from "@/utils/object";
 import { createSlice } from "@reduxjs/toolkit";
 
@@ -9,12 +9,15 @@ interface EditorState {
 }
 
 const initialState: EditorState = {
-  contents: {
-    new: {
-      key: "test-key",
-      type: "dropable",
-    },
-  },
+  contents: [
+    new ElementSchema("dropable", "drop-a", {
+      children: [
+        new ElementSchema("text", "text-a", {
+          children: ["Drop Here"],
+        }),
+      ],
+    }),
+  ],
 };
 
 const editorSlice = createSlice({
