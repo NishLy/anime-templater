@@ -1,56 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // store/modalSlice.ts
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { ReactNode } from "react";
-
-interface IContainer {
-  children?: Wrapper;
-  name?: string;
-  dropable?: boolean;
-}
-
-export interface Wrapper {
-  [key: string]: IContainer;
-}
+import { ElementNodes } from "@/type/schema";
+import { getNested, deleteNested, createNested } from "@/utils/object";
+import { createSlice } from "@reduxjs/toolkit";
 
 interface EditorState {
-  contents: Wrapper;
+  contents: ElementNodes;
 }
 
 const initialState: EditorState = {
   contents: {
     new: {
-      name: "dropable-1",
-      dropable: true,
+      key: "test-key",
+      type: "dropable",
     },
   },
 };
-
-function getNested(obj: any, path: string) {
-  return path.split(".").reduce((acc, key) => acc?.[key], obj);
-}
-
-function createNested(obj: any, path: string) {
-  return path.split(".").reduce((acc, key) => {
-    if (!(key in acc) || typeof acc[key] !== "object") {
-      acc[key] = {};
-    }
-    return acc[key];
-  }, obj);
-}
-
-function deleteNested(obj: any, path: string) {
-  const keys = path.split(".");
-  const lastKey = keys.pop();
-  if (!lastKey) return;
-  const parent = keys.reduce((acc, key) => acc?.[key], obj);
-
-  if (parent && lastKey in parent) {
-    delete parent[lastKey];
-    return true; // deleted successfully
-  }
-  return false; // nothing to delete
-}
 
 const editorSlice = createSlice({
   name: "editor",
@@ -82,11 +47,16 @@ const editorSlice = createSlice({
       createNested(state.contents, overId + "." + key);
     },
     add(state, actions) {
-      const key = actions.payload.key;
-      const parentKey = actions.payload.parentKey;
-      const node = actions.payload.node;
-      createNested(state.contents, parentKey + ".children." + key);
-      getNested(state.contents, parentKey + ".children." + key).node = node;
+      const { key, parentKey, node } = actions.payload;
+
+      createNested(state.contents, parentKey + ".children");
+
+      const parentChildren = getNested(state.contents, parentKey + ".children");
+
+      // Remove `key` from the node if it exists
+      const { key: _, ...cleanNode } = node;
+
+      parentChildren[key] = cleanNode;
     },
     remove(state, actions) {
       const key = actions.payload.key;

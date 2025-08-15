@@ -1,5 +1,5 @@
-import Draggable from "@/components/dragable";
-import { MenuItem } from "@/components/dropdown-container";
+import Draggable from "@/components/extensions/dragable";
+import { MenuItem } from "@/components/extensions/dropdown-container";
 import GridContainer from "@/components/grid-container";
 import ImagePickerModal from "@/components/modal/image-picker";
 import { closeModal, setModal } from "@/store/modal-slice";

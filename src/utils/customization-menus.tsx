@@ -1,4 +1,4 @@
-import { MenuItem } from "@/components/dropdown-container";
+import { MenuItem } from "@/components/extensions/dropdown-container";
 import Input from "@/components/input";
 import { VariantClass } from "./variant";
 import { CSSProperties, useState } from "react";

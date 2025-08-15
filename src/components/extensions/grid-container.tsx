@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import DropdownContainer from "./dropdown-container";
+import DropdownContainer from "./core/dropdown-container";
 import CustomizableContainer from "./customizable-container";
 import { useCustomizationMenus } from "@/utils/customization-menus";
 import { ReactNode } from "react";

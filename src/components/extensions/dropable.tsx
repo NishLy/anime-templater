@@ -9,12 +9,12 @@ import { useDispatch } from "react-redux";
 import { randomBase64 } from "@/utils/hash";
 import { add } from "@/store/editor-slice";
 
-interface IDroppable<T> {
+interface IDroppable {
   children: ReactNode;
   id: string;
 }
 
-function Droppable<T>(props: IDroppable<T>) {
+function Droppable<T>(props: IDroppable) {
   const dispatch = useDispatch();
   const { isOver, setNodeRef } = useDroppable({
     id: props.id,
