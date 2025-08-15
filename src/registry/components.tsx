@@ -9,6 +9,7 @@ const ComponentRegistry: Record<string, ElementType> = {
   dropable: Droppable,
   dragable: Draggable,
   text: TextComponent,
+
   plain: Fragment,
 };
 

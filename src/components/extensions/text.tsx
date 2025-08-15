@@ -1,6 +1,7 @@
 import React from "react";
 import Input from "../input";
 import { VariantClass } from "@/utils/variant";
+import Textarea from "../textarea";
 
 type TextTag = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "p" | "span";
 
@@ -11,7 +12,14 @@ interface TextComponentProps extends React.HTMLAttributes<HTMLElement> {
 
 function TextComponent({ tag, children, ...rest }: TextComponentProps) {
   if (!children) {
-    return <Input variant={VariantClass.md} />;
+    return (
+      <Textarea
+        focus
+        variant={VariantClass.md}
+        placeholder="Insert text here"
+        className="text-black"
+      />
+    );
   }
 
   switch (tag) {

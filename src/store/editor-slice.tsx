@@ -5,8 +5,6 @@ import {
   getNested,
   deleteNested,
   createNested,
-  getNestedSchema,
-  setNestedSchema,
   setNestedImmutable,
 } from "@/utils/object";
 import { createSlice } from "@reduxjs/toolkit";
@@ -20,11 +18,7 @@ const initialState: EditorState = {
     new ElementSchema("dropable", "drop-a", {
       children: [
         new ElementSchema("dragable", "dragable-1", {
-          children: [
-            new ElementSchema("text", "text-a", {
-              children: ["Drop Here"],
-            }),
-          ],
+          children: [],
         }),
       ],
     }),
